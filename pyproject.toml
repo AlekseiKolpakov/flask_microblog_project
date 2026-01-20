@@ -1,0 +1,42 @@
+[tool.black]
+line-length = 100
+target-version = ["py310"]
+exclude = '''
+/(
+  \.git
+  | \.venv
+  | venv
+  | __pycache__
+)/
+'''
+
+[tool.isort]
+profile = "black"
+line_length = 100
+skip = ["venv", ".venv"]
+py_version = 310
+
+[tool.mypy]
+python_version = "3.10"
+ignore_missing_imports = true
+explicit_package_bases = true
+strict = false
+
+[[tool.mypy.overrides]]
+module = [
+    "flask_restx.*",
+    "pydantic_settings",
+]
+ignore_missing_import = true
+
+[project]
+name = "backend"
+version = "0.1.0"
+dependencies = []
+
+[tool.setuptools]
+packages = ["backend"]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
