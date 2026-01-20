@@ -141,11 +141,12 @@ pytest backend/tests
 │   ├── models/
 │   ├── services/
 │   ├── utils/
+│   ├── requirements.txt
 │   └── main.py
 ├── frontend/
 │   ├── Dockerfile
 │   └── dist/
 ├── uploads/
 ├── docker-compose.yml
-└── requirements.txt
+└── requirements-dev.txt
 ```
