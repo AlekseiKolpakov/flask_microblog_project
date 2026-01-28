@@ -14,17 +14,33 @@ from ..services.tweets import create_tweet, get_feed_for_user
 from ..utils.responses import error, success
 from ..utils.serializers import serialize_tweets
 
+# Namespace для работы с твитами
 api = Namespace("tweets", description="Tweets")
 
+# Модель запроса для создания твита
 tweet_create_model = get_tweet_create_model(api)
 
 
 @api.route("")
 class Tweets(Resource):
+    """
+    Работа со списком твитов:
+    - получение ленты
+    - создание нового твита
+    """
 
     @auth_required
     @api.marshal_with(tweets_response, code=200)
     def get(self):
+        """
+        Получить ленту твитов текущего пользователя.
+
+        Поддерживает параметры:
+        - limit (по умолчанию 20, максимум 100)
+        - offset (по умолчанию 0)
+
+        :return: JSON со списком твитов
+        """
         limit = min(int(request.args.get("limit", 20)), 100)
         offset = int(request.args.get("offset", 0))
 
@@ -46,6 +62,16 @@ class Tweets(Resource):
     @auth_required
     @api.marshal_with(tweet_created_response, code=200)
     def post(self):
+        """
+        Создать новый твит.
+
+        Ожидает JSON:
+        {
+            "tweet_data": str,
+            "tweet_media_ids": [int]
+        }
+        :return: JSON с ID созданного твита
+        """
         data = request.json
         if not data or "tweet_data" not in data:
             return error("validation_error", "tweet_data is required", 400)
@@ -63,10 +89,19 @@ class Tweets(Resource):
 
 @api.route("/<int:tweet_id>")
 class TweetItem(Resource):
+    """
+    Работа с конкретным твитом.
+    """
 
     @auth_required
     @api.marshal_with(tweet_deleted_response, code=200)
     def delete(self, tweet_id: int):
+        """
+        Удалить твит текущего пользователя.
+
+        :param tweet_id: ID твита
+        :return: JSON с результатом операции
+        """
         with SessionLocal() as db:
             tweet = (
                 db.query(Tweet)

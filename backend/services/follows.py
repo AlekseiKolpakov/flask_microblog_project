@@ -8,6 +8,17 @@ def follow_user(
     current_user_id: int,
     target_user_id: int,
 ) -> bool:
+    """
+    Подписать текущего пользователя на другого пользователя.
+
+    Если подписка уже существует — ничего не делает.
+
+    :param db: SQLAlchemy сессия
+    :param current_user_id: ID пользователя, который подписывается
+    :param target_user_id: ID пользователя, на которого подписываются
+    :return: True — операция выполнена успешно
+    """
+    # Проверяем, существует ли уже подписка
     exists = (
         db.query(Follow)
         .filter(
@@ -20,6 +31,7 @@ def follow_user(
     if exists:
         return True
 
+    # Создаём новую подписку
     follow = Follow(
         follower_id=current_user_id,
         followed_id=target_user_id,
@@ -35,6 +47,16 @@ def unfollow_user(
     current_user_id: int,
     target_user_id: int,
 ) -> bool:
+    """
+    Отписать текущего пользователя от другого пользователя.
+
+    Если подписки нет — ничего не делает.
+
+    :param db: SQLAlchemy сессия
+    :param current_user_id: ID пользователя, который отписывается
+    :param target_user_id: ID пользователя, от которого отписываются
+    :return: True — операция выполнена успешно
+    """
     follow = (
         db.query(Follow)
         .filter(

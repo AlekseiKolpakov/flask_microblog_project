@@ -13,10 +13,18 @@ if TYPE_CHECKING:
 
 
 class User(Base):
+    """
+    Модель пользователя корпоративного микроблога.
+
+    Аутентификация осуществляется по api_key.
+    """
+
     __tablename__ = "users"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
     name: Mapped[str] = mapped_column(String(255), nullable=False)
+
     api_key: Mapped[str] = mapped_column(
         String(255),
         unique=True,
@@ -24,26 +32,31 @@ class User(Base):
         index=True,
     )
 
+    # Твиты пользователя
     tweets: Mapped[List["Tweet"]] = relationship(
         back_populates="author",
         cascade="all, delete-orphan",
     )
 
+    # Лайки пользователя
     likes: Mapped[List["Like"]] = relationship(
         back_populates="user",
         cascade="all, delete-orphan",
     )
 
+    # Подписчики
     followers: Mapped[List["Follow"]] = relationship(
         foreign_keys="Follow.followed_id",
         back_populates="followed",
     )
 
+    # Подписки
     following: Mapped[List["Follow"]] = relationship(
         foreign_keys="Follow.follower_id",
         back_populates="follower",
     )
 
+    # Загруженные пользователем медиа
     uploaded_medias: Mapped[List["Media"]] = relationship(
         back_populates="owner",
     )

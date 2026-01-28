@@ -6,20 +6,24 @@ from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
 from ..core.config import settings
 
 
-# Базовый класс для всех моделей
 class Base(DeclarativeBase):
+    """
+    Базовый класс для всех SQLAlchemy моделей.
+    """
+
     pass
 
 
-# Создаём sync engine
+# Создаём SQLAlchemy engine
 engine = create_engine(
     settings.DATABASE_URL,
-    echo=False,
-    pool_pre_ping=True,
+    echo=settings.SQL_ECHO,  # логирование SQL-запросов
+    future=True,
+    pool_pre_ping=True,  # проверка соединения перед использованием
 )
 
 
-# Фабрика сессий
+# Фабрика сессий SQLAlchemy
 SessionLocal = sessionmaker(
     bind=engine,
     autoflush=False,
@@ -28,8 +32,15 @@ SessionLocal = sessionmaker(
 )
 
 
-# Dependency / helper для Flask
 def get_db() -> Generator[Session, None, None]:
+    """
+    Генератор SQLAlchemy-сессии.
+
+    Используется как dependency/helper.
+    Гарантирует корректное закрытие сессии.
+
+    :return: SQLAlchemy Session
+    """
     db = SessionLocal()
     try:
         yield db

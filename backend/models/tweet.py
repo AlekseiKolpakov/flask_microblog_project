@@ -13,11 +13,20 @@ if TYPE_CHECKING:
 
 
 class Tweet(Base):
+    """
+    Модель твита.
+
+    Основная сущность сервиса микроблогов.
+    """
+
     __tablename__ = "tweets"
 
     id: Mapped[int] = mapped_column(primary_key=True)
+
+    # Текст твита
     text: Mapped[str] = mapped_column(String, nullable=False)
 
+    # Автор твита
     author_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"),
         nullable=False,
@@ -30,11 +39,14 @@ class Tweet(Base):
         index=True,
     )
 
+    # Связи
     author: Mapped["User"] = relationship(back_populates="tweets")
+
     medias: Mapped[list["Media"]] = relationship(
         back_populates="tweet",
         cascade="all, delete-orphan",
     )
+
     likes: Mapped[list["Like"]] = relationship(
         back_populates="tweet",
         cascade="all, delete-orphan",
