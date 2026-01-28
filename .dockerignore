@@ -1,0 +1,21 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Виртуальное окружение
+venv/
+.venv/
+
+# Tests (не нужны в prod)
+backend/tests/
+backend/seed.sql
+
+# Git
+.git/
+.gitignore
+
+# CI / local
+.env
+.env.*

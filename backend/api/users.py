@@ -9,15 +9,24 @@ from ..services.users import get_user_by_id
 from ..utils.responses import error, success
 from ..utils.serializers import serialize_user_profile
 
+# Namespace для работы с пользователями
 api = Namespace("users", description="Users")
 
 
 @api.route("/me")
 class Me(Resource):
+    """
+    Работа с профилем текущего пользователя.
+    """
 
     @auth_required
     @api.marshal_with(user_profile_response, code=200)
     def get(self):
+        """
+        Получить профиль текущего пользователя.
+
+        :return: JSON с данными пользователя
+        """
         return success(
             {
                 "user": serialize_user_profile(g.user),
@@ -27,10 +36,19 @@ class Me(Resource):
 
 @api.route("/<int:user_id>")
 class User(Resource):
+    """
+    Работа с профилем другого пользователя.
+    """
 
     @auth_required
     @api.marshal_with(user_profile, code=200)
     def get(self, user_id: int):
+        """
+        Получить профиль пользователя по ID.
+
+        :param user_id: ID пользователя
+        :return: JSON с профилем пользователя
+        """
         with SessionLocal() as db:
             user = get_user_by_id(db, user_id)
             if not user:
@@ -45,10 +63,19 @@ class User(Resource):
 
 @api.route("/<int:user_id>/follow")
 class Follow(Resource):
+    """
+    Управление подписками на пользователей.
+    """
 
     @auth_required
     @api.marshal_with(simple_response, code=200)
     def post(self, user_id: int):
+        """
+        Подписаться на пользователя.
+
+        :param user_id: ID пользователя
+        :return: JSON с результатом операции
+        """
         with SessionLocal() as db:
             follow_user(db, g.user.id, user_id)
         return success()
@@ -56,6 +83,12 @@ class Follow(Resource):
     @auth_required
     @api.marshal_with(simple_response, code=200)
     def delete(self, user_id: int):
+        """
+        Отписаться от пользователя.
+
+        :param user_id: ID пользователя
+        :return: JSON с результатом операции
+        """
         with SessionLocal() as db:
             unfollow_user(db, g.user.id, user_id)
         return success()

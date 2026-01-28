@@ -13,12 +13,24 @@ def create_tweet(
     text: str,
     media_ids: list[int] | None = None,
 ) -> Tweet:
+    """
+    Создать новый твит.
+
+    При необходимости прикрепляет медиафайлы,
+    принадлежащие автору твита.
+
+    :param db: SQLAlchemy сессия
+    :param author_id: ID автора твита
+    :param text: Текст твита
+    :param media_ids: Список ID медиафайлов
+    :return: Созданный объект Tweet
+    """
     tweet = Tweet(
         author_id=author_id,
         text=text,
     )
     db.add(tweet)
-    db.flush()
+    db.flush()  # Получаем tweet.id до commit
 
     if media_ids:
         medias = (
@@ -38,6 +50,13 @@ def create_tweet(
 
 
 def delete_tweet(db: Session, tweet: Tweet) -> bool:
+    """
+    Удалить твит.
+
+    :param db: SQLAlchemy сессия
+    :param tweet: Объект твита
+    :return: True — операция выполнена успешно
+    """
     db.delete(tweet)
     db.commit()
     return True
@@ -49,9 +68,26 @@ def get_feed_for_user(
     limit: int = 20,
     offset: int = 0,
 ):
+    """
+    Получить ленту твитов для пользователя.
+
+    В ленту входят:
+    - собственные твиты пользователя
+    - твиты пользователей, на которых он подписан
+
+    Сортировка:
+    1. По количеству лайков (по убыванию)
+    2. По дате создания (по убыванию)
+
+    :param db: SQLAlchemy сессия
+    :param user_id: ID пользователя
+    :param limit: Количество твитов
+    :param offset: Смещение
+    :return: Список объектов Tweet
+    """
     return (
         db.query(Tweet)
-        .outerjoin(Like)  # outerjoin, чтобы твиты без лайков не пропали
+        .outerjoin(Like)  # outerjoin — чтобы твиты без лайков не пропали
         .filter(
             or_(
                 Tweet.author_id == user_id,
@@ -68,7 +104,7 @@ def get_feed_for_user(
         .group_by(Tweet.id)  # обязательно для COUNT
         .order_by(
             desc(func.count(Like.id)),  # сортировка по популярности
-            desc(Tweet.created_at),  # вторичная сортировка
+            desc(Tweet.created_at),  # сортировка по дате создания
         )
         .limit(limit)
         .offset(offset)

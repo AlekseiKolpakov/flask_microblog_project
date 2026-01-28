@@ -5,6 +5,13 @@ from ..models.user import User
 
 
 def get_user_by_id(db: Session, user_id: int):
+    """
+    Получить пользователя по ID с подгрузкой подписок.
+
+    :param db: SQLAlchemy сессия
+    :param user_id: ID пользователя
+    :return: Объект User или None
+    """
     return (
         db.query(User)
         .options(
@@ -17,6 +24,15 @@ def get_user_by_id(db: Session, user_id: int):
 
 
 def get_user_by_api_key(db, api_key: str):
+    """
+    Получить пользователя по API-ключу.
+
+    Используется для аутентификации.
+
+    :param db: SQLAlchemy сессия
+    :param api_key: API-ключ пользователя
+    :return: Объект User или None
+    """
     return (
         db.query(User)
         .options(

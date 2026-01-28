@@ -4,6 +4,16 @@ from ..models.like import Like
 
 
 def like_tweet(db: Session, user_id: int, tweet_id: int) -> bool:
+    """
+    Поставить лайк на твит.
+
+    Если лайк уже существует — ничего не делает.
+
+    :param db: SQLAlchemy сессия
+    :param user_id: ID пользователя
+    :param tweet_id: ID твита
+    :return: True — операция выполнена успешно
+    """
     exists = (
         db.query(Like)
         .filter(
@@ -23,6 +33,16 @@ def like_tweet(db: Session, user_id: int, tweet_id: int) -> bool:
 
 
 def unlike_tweet(db: Session, user_id: int, tweet_id: int) -> bool:
+    """
+    Убрать лайк с твита.
+
+    Если лайка нет — ничего не делает.
+
+    :param db: SQLAlchemy сессия
+    :param user_id: ID пользователя
+    :param tweet_id: ID твита
+    :return: True — операция выполнена успешно
+    """
     like = (
         db.query(Like)
         .filter(

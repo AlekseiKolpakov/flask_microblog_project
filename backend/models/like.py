@@ -11,7 +11,16 @@ if TYPE_CHECKING:
 
 
 class Like(Base):
+    """
+    Модель лайка твита пользователем.
+
+    Один пользователь может поставить лайк
+    одному твиту только один раз.
+    """
+
     __tablename__ = "likes"
+
+    # Запрет дублирования лайков
     __table_args__ = (UniqueConstraint("user_id", "tweet_id", name="uq_user_tweet_like"),)
 
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -27,5 +36,6 @@ class Like(Base):
         index=True,
     )
 
+    # Связи
     user: Mapped["User"] = relationship(back_populates="likes")
     tweet: Mapped["Tweet"] = relationship(back_populates="likes")

@@ -2,6 +2,8 @@ import os
 
 from flask import Flask, send_from_directory
 
+from .core.config import settings
+
 # Глобальный экземпляр Swagger API с кастомным error handler
 from .core.swagger import api
 
@@ -43,6 +45,8 @@ def create_app() -> Flask:
 
     # likes относятся к твитам, поэтому живут под /api/tweets/<id>/likes
     api.add_namespace(likes_ns, path="/api/tweets")
+
+    app.config["DEBUG"] = settings.DEBUG
 
     return app
 

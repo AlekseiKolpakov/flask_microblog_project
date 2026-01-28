@@ -3,6 +3,7 @@ from werkzeug.exceptions import HTTPException
 
 from ..utils.responses import error
 
+# Соответствие HTTP-кодов типам ошибок API
 ERROR_TYPE_BY_STATUS = {
     401: "auth_error",
     403: "permission_error",
@@ -12,7 +13,20 @@ ERROR_TYPE_BY_STATUS = {
 
 
 class CustomApi(Api):
+    """
+    Кастомный Api для Flask-RESTX.
+
+    Переопределяет обработку ошибок,
+    чтобы все ошибки возвращались в едином JSON-формате.
+    """
+
     def handle_error(self, e):
+        """
+        Глобальный обработчик ошибок API.
+
+        :param e: Исключение
+        :return: JSON-ответ с ошибкой
+        """
         # HTTP ошибки (401, 403, 404, ...)
         if isinstance(e, HTTPException):
             return error(
@@ -29,6 +43,7 @@ class CustomApi(Api):
         )
 
 
+# Основной объект API
 api = CustomApi(
     title="Microblog API",
     version="1.0",
@@ -73,6 +88,12 @@ author_model = api.model(
 
 
 def get_tweet_create_model(api):
+    """
+    Swagger-модель для создания твита.
+
+    :param api: Экземпляр Flask-RESTX Api
+    :return: Swagger model
+    """
     return api.model(
         "TweetCreate",
         {
